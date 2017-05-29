@@ -1,0 +1,16 @@
+[package]
+authors = ["Kornel <kornel@geekhood.net>"]
+name = "mss_saliency"
+version = "1.0.0"
+include = ["src/**/*", "Cargo.toml", "README.md"]
+description = "Detection of visually salient image regions using Maximum Symmetric Surround algorithm"
+homepage = "https://infoscience.epfl.ch/record/151989"
+documentation = "https://docs.rs/mss_saliency"
+repository = "https://github.com/pornel/mss_saliency"
+readme = "README.md"
+keywords = ["saliency"]
+license = "MIT"
+categories = ["multimedia::images"]
+
+[dependencies]
+imgref = "1.0.0"
