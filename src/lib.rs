@@ -9,14 +9,14 @@ mod integral;
 use std::cmp::min;
 use integral::*;
 
-pub use imgref::{ImgRef, Img};
+pub use imgref::*;
 
 /// Create a saliency map.
 ///
 /// The input is a single channel 2D 8-bit image (see imgref crate). The maximum image size is about 16Mpix, because internal u32 counters will start overflowing on larger images.
 ///
 /// The output is a 2D array of the same size of `u16` values. Max value is 65025 (255*255), but expect most values to be low.
-pub fn maximum_symmetric_surround_saliency(image: ImgRef<u8>) -> Img<Vec<u16>> {
+pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
     let integral_img = integral_image(image);
 
     let (width, height) = (image.width, image.height);
