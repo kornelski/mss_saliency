@@ -44,3 +44,10 @@ pub fn maximum_symmetric_surround_saliency(image: ImgRef<u8>) -> Img<Vec<u16>> {
 
     return Img::new(sal_map, width as usize, height as usize);
 }
+
+#[test]
+fn oversized_input_is_ok() {
+    let img = ImgVec::new(vec![127u8; 35*18], 33, 17);
+    let res = maximum_symmetric_surround_saliency(img.as_ref());
+    assert_eq!(res.buf.len(), 33*17);
+}
