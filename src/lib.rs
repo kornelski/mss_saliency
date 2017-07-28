@@ -19,8 +19,7 @@ pub use imgref::*;
 pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
     let integral_img = integral_image(image);
 
-    let (width, height) = (image.width, image.height);
-    let stride = image.stride as u32;
+    let (width, height) = (image.width() as u32, image.height() as u32);
 
     let mut sal_map = Vec::with_capacity(width as usize * height as usize);
     for y in 0..height {
@@ -36,7 +35,7 @@ pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
             let area = (x2 - x1 + 1) * (y2 - y1 + 1);
 
             let avg = (integral_img.integral_sum(x1, y1, x2, y2) / area as u32) as u8;
-            let diff = (avg as i16 - image.buf[(y*stride + x) as usize] as i16) as i32;
+            let diff = (avg as i16 - image[(x, y)] as i16) as i32;
 
             sal_map.push((diff*diff) as u16);
         }
