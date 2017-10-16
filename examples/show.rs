@@ -9,7 +9,7 @@ use std::path::PathBuf;
 fn main() {
     let path = PathBuf::from(env::args_os().nth(1).expect("Please provide a PNG file as an argument"));
     let img = lodepng::decode32_file(&path).unwrap();
-    let fast_gray: Vec<_> = img.buffer.as_ref().iter().map(|px| {
+    let fast_gray: Vec<_> = img.buffer.iter().map(|px| {
         (px.a as u32 * (px.r as u32 + px.g as u32 * 2 + px.b as u32) / (4*256)) as u8
     }).collect();
 
