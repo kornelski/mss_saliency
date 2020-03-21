@@ -1,7 +1,7 @@
 use std::iter::repeat;
 use imgref::*;
 
-pub fn integral_image(image: ImgRef<u8>) -> ImgVec<u32> {
+pub fn integral_image(image: ImgRef<'_, u8>) -> ImgVec<u32> {
     let (in_width, in_height) = (image.width(), image.height());
 
     let out_width = in_width + 1;

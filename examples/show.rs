@@ -1,6 +1,3 @@
-extern crate mss_saliency;
-extern crate lodepng;
-extern crate imgref;
 
 use std::env;
 use std::cmp;
@@ -17,8 +14,8 @@ fn main() {
 
     let sal = mss_saliency::maximum_symmetric_surround_saliency(gray_img);
 
-    let rgb: Vec<_> = sal.buf.iter().map(|&v| (cmp::min(255,v>>6) as u8,(v>>8) as u8,cmp::min(255,v>>2) as u8)).collect();
+    let rgb: Vec<_> = sal.pixels().map(|v| (cmp::min(255,v>>6) as u8,(v>>8) as u8,cmp::min(255,v>>2) as u8)).collect();
     let new_path = format!("{}-mss-saliency.png", path.display());
-    lodepng::encode24_file(&new_path, &rgb, sal.width as usize, sal.height as usize).unwrap();
+    lodepng::encode24_file(&new_path, &rgb, sal.width(), sal.height()).unwrap();
     println!("Wrote {}", new_path);
 }

@@ -2,12 +2,9 @@
 //!
 //! http://ivrl.epfl.ch/research/saliency/MSSS.html
 
-extern crate imgref;
 
 mod integral;
-
-use std::cmp::min;
-use integral::*;
+use crate::integral::*;
 
 pub use imgref::*;
 
@@ -23,14 +20,14 @@ pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
 
     let mut sal_map = Vec::with_capacity(width as usize * height as usize);
     for y in 0..height {
-        let y_size = min(y, height - y);
+        let y_size = y.min(height - y);
         let y1 = y.saturating_sub(y_size);
-        let y2 = min(y + y_size, height - 1);
+        let y2 = (y + y_size).min(height - 1);
 
         for x in 0..width {
-            let x_size = min(x, width - x);
+            let x_size = x.min(width - x);
             let x1 = x.saturating_sub(x_size);
-            let x2 = min(x + x_size, width - 1);
+            let x2 = (x + x_size).min(width - 1);
 
             let area = (x2 - x1 + 1) * (y2 - y1 + 1);
 
@@ -48,5 +45,5 @@ pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
 fn oversized_input_is_ok() {
     let img = ImgVec::new(vec![127u8; 35*18], 33, 17);
     let res = maximum_symmetric_surround_saliency(img.as_ref());
-    assert_eq!(res.buf.len(), 33*17);
+    assert_eq!(res.buf().len(), 33*17);
 }

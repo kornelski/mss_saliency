@@ -1,6 +1,6 @@
 #![feature(test)]
 extern crate test;
-extern crate mss_saliency;
+
 
 use mss_saliency::*;
 use test::Bencher;
