@@ -1,6 +1,6 @@
 //! Sailiency map is computed using Maximum Symmetric Surround algorithm by Radhakrishna Achanta.
 //!
-//! http://ivrl.epfl.ch/research/saliency/MSSS.html
+//! <https://core.ac.uk/download/pdf/147962379.pdf>
 
 
 mod integral;

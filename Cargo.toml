@@ -7,17 +7,17 @@ homepage = "https://infoscience.epfl.ch/record/151989"
 documentation = "https://docs.rs/mss_saliency"
 repository = "https://github.com/kornelski/mss_saliency"
 readme = "README.md"
-keywords = ["saliency"]
+keywords = ["saliency", "entropy", "segmentation"]
 license = "MIT"
 categories = ["multimedia::images"]
-version = "1.0.5"
+version = "1.0.6"
 edition = "2018"
 
 [dependencies]
-imgref = "1.6.1"
+imgref = "1.7.0"
 
 [dev-dependencies]
-lodepng = "3.0.0"
+lodepng = "3.2.1"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
