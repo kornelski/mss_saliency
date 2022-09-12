@@ -38,7 +38,7 @@ pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
         }
     }
 
-    return Img::new(sal_map, width as usize, height as usize);
+    Img::new(sal_map, width as usize, height as usize)
 }
 
 #[test]
