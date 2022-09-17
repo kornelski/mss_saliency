@@ -15,6 +15,7 @@ edition = "2021"
 
 [dependencies]
 imgref = "1.9"
+rgb = { version = "0.8.34", default-features = false }
 
 [dev-dependencies]
 lodepng = "3.7"

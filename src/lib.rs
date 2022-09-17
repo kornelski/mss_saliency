@@ -8,6 +8,8 @@ use std::ops::{Add, AddAssign, Sub};
 use crate::integral::*;
 
 pub use imgref::*;
+pub use rgb::RGB;
+use rgb::ComponentMap;
 
 /// Create a saliency map.
 ///
@@ -16,6 +18,10 @@ pub use imgref::*;
 /// The output is a 2D array of the same size of `u16` values. Max value is 65025 (255*255), but expect most values to be low.
 pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
     maximum_symmetric_surround_saliency_generic::<u8, u32>(image)
+}
+
+pub fn maximum_symmetric_surround_saliency_rgb(image: Img<&[RGB<u8>]>) -> Img<Vec<u16>> {
+    maximum_symmetric_surround_saliency_generic::<RGB<u8>, RGB<u32>>(image)
 }
 
 fn maximum_symmetric_surround_saliency_generic<I, O>(image: Img<&[I]>) -> Img<Vec<u16>>
@@ -51,6 +57,13 @@ trait AreaDiff<T> {
 impl AreaDiff<u32> for u8 {
     fn area_diff(self, sum: u32, area: u32) -> i32 {
         ((sum / area) as i16 - self as i16) as i32
+    }
+}
+
+impl AreaDiff<RGB<u32>> for RGB<u8> {
+    fn area_diff(self, sum: RGB<u32>, area: u32) -> i32 {
+        let tmp = sum.map(|s| (s / area) as i16) - self.map(|c| c as i16);
+        tmp.r.max(tmp.g).max(tmp.b) as i32
     }
 }
 
