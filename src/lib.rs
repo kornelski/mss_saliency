@@ -4,6 +4,7 @@
 
 
 mod integral;
+use std::ops::{Add, AddAssign, Sub};
 use crate::integral::*;
 
 pub use imgref::*;
@@ -14,7 +15,12 @@ pub use imgref::*;
 ///
 /// The output is a 2D array of the same size of `u16` values. Max value is 65025 (255*255), but expect most values to be low.
 pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
-    let integral_img = integral_image(image);
+    maximum_symmetric_surround_saliency_generic::<u8, u32>(image)
+}
+
+fn maximum_symmetric_surround_saliency_generic<I, O>(image: Img<&[I]>) -> Img<Vec<u16>>
+    where I: Copy + AreaDiff<O>, O: From<I> + Default + AddAssign + Copy + Add<Output=O> + Sub<Output=O> {
+    let integral_img = IntegralImage::new(image);
 
     let (width, height) = (image.width() as u32, image.height() as u32);
 
@@ -30,15 +36,22 @@ pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
             let x2 = (x + x_size).min(width - 1);
 
             let area = (x2 - x1 + 1) * (y2 - y1 + 1);
-
-            let avg = (integral_img.integral_sum(x1, y1, x2, y2) / area as u32) as u8;
-            let diff = (avg as i16 - image[(x, y)] as i16) as i32;
-
-            sal_map.push((diff*diff) as u16);
+            let diff = image[(x, y)].area_diff(integral_img.integral_sum(x1, y1, x2, y2), area);
+            sal_map.push(diff.pow(2) as u16);
         }
     }
 
     Img::new(sal_map, width as usize, height as usize)
+}
+
+trait AreaDiff<T> {
+    fn area_diff(self, sum: T, area: u32) -> i32;
+}
+
+impl AreaDiff<u32> for u8 {
+    fn area_diff(self, sum: u32, area: u32) -> i32 {
+        ((sum / area) as i16 - self as i16) as i32
+    }
 }
 
 #[test]
