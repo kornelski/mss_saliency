@@ -17,15 +17,21 @@ use rgb::ComponentMap;
 ///
 /// The output is a 2D array of the same size of `u16` values. Max value is 65025 (255*255), but expect most values to be low.
 pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
-    maximum_symmetric_surround_saliency_generic::<u8, u32>(image)
+    maximum_symmetric_surround_saliency_generic::<u8, u32, u16>(image)
 }
 
+/// Same as [`maximum_symmetric_surround_saliency`], but returns maximum of 3 channels.
 pub fn maximum_symmetric_surround_saliency_rgb(image: Img<&[RGB<u8>]>) -> Img<Vec<u16>> {
-    maximum_symmetric_surround_saliency_generic::<RGB<u8>, RGB<u32>>(image)
+    maximum_symmetric_surround_saliency_generic::<RGB<u8>, RGB<u32>, u16>(image)
 }
 
-fn maximum_symmetric_surround_saliency_generic<I, O>(image: Img<&[I]>) -> Img<Vec<u16>>
-    where I: Copy + AreaDiff<O>, O: From<I> + Default + AddAssign + Copy + Add<Output=O> + Sub<Output=O> {
+/// Same as [`maximum_symmetric_surround_saliency`], but works on `f32`.
+pub fn maximum_symmetric_surround_saliency_f32(image: Img<&[f32]>) -> Img<Vec<f32>> {
+    maximum_symmetric_surround_saliency_generic::<f32, f32, f32>(image)
+}
+
+fn maximum_symmetric_surround_saliency_generic<I, O, Res>(image: Img<&[I]>) -> Img<Vec<Res>>
+    where I: Copy + AreaDiff<O, Res>, O: From<I> + Default + AddAssign + Copy + Add<Output=O> + Sub<Output=O> {
     let integral_img = IntegralImage::new(image);
 
     let (width, height) = (image.width() as u32, image.height() as u32);
@@ -43,27 +49,36 @@ fn maximum_symmetric_surround_saliency_generic<I, O>(image: Img<&[I]>) -> Img<Ve
 
             let area = (x2 - x1 + 1) * (y2 - y1 + 1);
             let diff = image[(x, y)].area_diff(integral_img.integral_sum(x1, y1, x2, y2), area);
-            sal_map.push(diff.pow(2) as u16);
+            sal_map.push(diff);
         }
     }
 
     Img::new(sal_map, width as usize, height as usize)
 }
 
-trait AreaDiff<T> {
-    fn area_diff(self, sum: T, area: u32) -> i32;
+trait AreaDiff<Sums, Res> {
+    fn area_diff(self, sum: Sums, area: u32) -> Res;
 }
 
-impl AreaDiff<u32> for u8 {
-    fn area_diff(self, sum: u32, area: u32) -> i32 {
-        ((sum / area) as i16 - self as i16) as i32
+impl AreaDiff<u32, u16> for u8 {
+    fn area_diff(self, sum: u32, area: u32) -> u16 {
+        let diff = ((sum / area) as i16 - self as i16) as i32;
+        diff.pow(2) as u16
     }
 }
 
-impl AreaDiff<RGB<u32>> for RGB<u8> {
-    fn area_diff(self, sum: RGB<u32>, area: u32) -> i32 {
+impl AreaDiff<f32, f32> for f32 {
+    fn area_diff(self, sum: f32, area: u32) -> f32 {
+        let diff = (sum / area as f32) - self;
+        diff * diff
+    }
+}
+
+impl AreaDiff<RGB<u32>, u16> for RGB<u8> {
+    fn area_diff(self, sum: RGB<u32>, area: u32) -> u16 {
         let tmp = sum.map(|s| (s / area) as i16) - self.map(|c| c as i16);
-        tmp.r.max(tmp.g).max(tmp.b) as i32
+        let diff = tmp.r.max(tmp.g).max(tmp.b) as i32;
+        diff.pow(2) as u16
     }
 }
 
