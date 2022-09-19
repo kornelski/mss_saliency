@@ -2,10 +2,8 @@
 //!
 //! <https://core.ac.uk/download/pdf/147962379.pdf>
 
-
-mod integral;
-use std::ops::{Add, AddAssign, Sub};
-use crate::integral::*;
+use summed_area::SummedArea;
+use std::ops::{Add, Sub};
 
 pub use imgref::*;
 pub use rgb::RGB;
@@ -31,8 +29,8 @@ pub fn maximum_symmetric_surround_saliency_f32(image: Img<&[f32]>) -> Img<Vec<f3
 }
 
 fn maximum_symmetric_surround_saliency_generic<I, O, Res>(image: Img<&[I]>) -> Img<Vec<Res>>
-    where I: Copy + AreaDiff<O, Res>, O: From<I> + Default + AddAssign + Copy + Add<Output=O> + Sub<Output=O> {
-    let integral_img = IntegralImage::new(image);
+    where I: Copy + AreaDiff<O, Res>, O: From<I> + Default + Copy + Add<Output=O> + Sub<Output=O> {
+    let integral_img = SummedArea::new(image);
 
     let (width, height) = (image.width() as u32, image.height() as u32);
 
@@ -48,7 +46,7 @@ fn maximum_symmetric_surround_saliency_generic<I, O, Res>(image: Img<&[I]>) -> I
             let x2 = (x + x_size).min(width - 1);
 
             let area = (x2 - x1 + 1) * (y2 - y1 + 1);
-            let diff = image[(x, y)].area_diff(integral_img.integral_sum(x1, y1, x2, y2), area);
+            let diff = image[(x, y)].area_diff(integral_img.sum_range(x1 as usize..x2 as usize, y1 as usize..y2 as usize), area);
             sal_map.push(diff);
         }
     }
