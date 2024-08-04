@@ -2,12 +2,12 @@
 //!
 //! <https://core.ac.uk/download/pdf/147962379.pdf>
 
+use rgb::prelude::*;
 use summed_area::SummedArea;
 use std::ops::{Add, Sub};
 
 pub use imgref::*;
-pub use rgb::RGB;
-use rgb::ComponentMap;
+pub use rgb::Rgb;
 
 /// Create a saliency map.
 ///
@@ -19,8 +19,8 @@ pub fn maximum_symmetric_surround_saliency(image: Img<&[u8]>) -> Img<Vec<u16>> {
 }
 
 /// Same as [`maximum_symmetric_surround_saliency`], but returns maximum of 3 channels.
-pub fn maximum_symmetric_surround_saliency_rgb(image: Img<&[RGB<u8>]>) -> Img<Vec<u16>> {
-    maximum_symmetric_surround_saliency_generic::<RGB<u8>, RGB<u32>, u16>(image)
+pub fn maximum_symmetric_surround_saliency_rgb(image: Img<&[Rgb<u8>]>) -> Img<Vec<u16>> {
+    maximum_symmetric_surround_saliency_generic::<Rgb<u8>, Rgb<u32>, u16>(image)
 }
 
 /// Same as [`maximum_symmetric_surround_saliency`], but works on `f32`.
@@ -72,8 +72,8 @@ impl AreaDiff<f32, f32> for f32 {
     }
 }
 
-impl AreaDiff<RGB<u32>, u16> for RGB<u8> {
-    fn area_diff(self, sum: RGB<u32>, area: u32) -> u16 {
+impl AreaDiff<Rgb<u32>, u16> for Rgb<u8> {
+    fn area_diff(self, sum: Rgb<u32>, area: u32) -> u16 {
         let tmp = sum.map(|s| (s / area) as i16) - self.map(|c| c as i16);
         let diff = tmp.r.max(tmp.g).max(tmp.b) as i32;
         diff.pow(2) as u16
